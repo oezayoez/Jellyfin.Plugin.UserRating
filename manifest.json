@@ -1,20 +1,20 @@
 [
   {
-    "guid": "b8c5d3e7-4f6a-8b9c-1d2e-3f4a5b6c7d8e",
+    "guid": "f6d662fc-4a62-410f-9260-bac3cf2b5c37",
     "name": "User Ratings",
     "description": "Allow users to rate and review movies, TV shows, and music. See what other users on your server think!",
     "overview": "Social rating system for Jellyfin - rate content and see ratings from other users on your server",
-    "owner": "davidhenry",
+    "owner": "oezayoez",
     "category": "General",
-    "imageUrl": "https://raw.githubusercontent.com/aG00Dtime/Jellyfin.Plugin.UserRating/main/icon.png",
+    "imageUrl": "https://raw.githubusercontent.com/oezayoez/Jellyfin.Plugin.UserRating/main/icon.png",
     "versions": [
       {
         "version": "1.7.32.0",
-        "changelog": "Release 1.7.32",
-        "targetAbi": "10.9.0.0",
-        "sourceUrl": "https://github.com/aG00Dtime/Jellyfin.Plugin.UserRating/releases/download/v1.7.32/Jellyfin.Plugin.UserRatings.zip",
-        "checksum": "cad9a3b149f8f69b6475a8d961dd23a1",
-        "timestamp": "2025-11-02T12:37:48Z"
+        "changelog": "Add ProviderIds storage and self-heal on rescan",
+        "targetAbi": "10.11.0.0",
+        "sourceUrl": "https://github.com/oezayoez/Jellyfin.Plugin.UserRating/releases/download/v1.7.32/Jellyfin.Plugin.UserRatings.zip",
+        "checksum": "38598908649f5cae286b805f05dd725b",
+        "timestamp": "2026-03-09T04:00:00Z"
       }
     ]
   }
