@@ -5,6 +5,8 @@ using System.Linq;
 using System.Text.Json;
 using Jellyfin.Plugin.UserRatings.Models;
 using MediaBrowser.Common.Configuration;
+using MediaBrowser.Controller.Entities;
+using MediaBrowser.Controller.Library;
 
 namespace Jellyfin.Plugin.UserRatings.Data
 {
@@ -13,12 +15,36 @@ namespace Jellyfin.Plugin.UserRatings.Data
         private readonly string _dataPath;
         private Dictionary<string, UserRating> _ratings = new();
         private readonly object _lock = new object();
+        private readonly ILibraryManager _libraryManager;
+        private bool _backfillDone = false;
 
-        public RatingRepository(IApplicationPaths appPaths)
+        public RatingRepository(IApplicationPaths appPaths, ILibraryManager libraryManager)
         {
             _dataPath = Path.Combine(appPaths.PluginConfigurationsPath, "UserRatings", "ratings.json");
             Directory.CreateDirectory(Path.GetDirectoryName(_dataPath)!);
+            _libraryManager = libraryManager;
             LoadRatings();
+        }
+
+        private void BackfillProviderIds()
+        {
+            lock (_lock)
+            {
+                bool needsSave = false;
+
+                foreach (var rating in _ratings.Values)
+                {
+                    if (rating.ProviderIds != null && rating.ProviderIds.Count > 0) continue;
+
+                    var item = _libraryManager.GetItemById(rating.ItemId);
+                    if (item?.ProviderIds == null) continue;
+
+                    rating.ProviderIds = new Dictionary<string, string>(item.ProviderIds);
+                    needsSave = true;
+                }
+
+                if (needsSave) SaveRatings();
+            }
         }
 
         private void LoadRatings()
@@ -114,7 +140,7 @@ namespace Jellyfin.Plugin.UserRatings.Data
             lock (_lock)
             {
                 var ratings = _ratings.Values.Where(r => r.ItemId == itemId).ToList();
-                
+
                 return new RatingStats
                 {
                     AverageRating = ratings.Any() ? ratings.Average(r => r.Rating) : 0,
@@ -137,6 +163,57 @@ namespace Jellyfin.Plugin.UserRatings.Data
         {
             lock (_lock)
             {
+                if (!_backfillDone)
+                {
+                    _backfillDone = true;
+                    BackfillProviderIds(); // lock inside is fine, same thread
+                }
+
+                bool needsSave = false;
+
+                var staleGroups = _ratings.Values
+                    .GroupBy(r => r.ItemId)
+                    .Where(g => _libraryManager.GetItemById(g.Key) == null)
+                    .ToList();
+
+
+                foreach (var group in staleGroups)
+                {
+                    var providerIds = group
+                        .FirstOrDefault(r => r.ProviderIds is { Count: > 0 })
+                        ?.ProviderIds;
+
+                    if (providerIds == null) continue;
+
+                    BaseItem? match = null;
+                    foreach (var kv in providerIds)
+                    {
+                        var query = new MediaBrowser.Controller.Entities.InternalItemsQuery
+                        {
+                            HasAnyProviderId = new Dictionary<string, string> { { kv.Key, kv.Value } }
+                        };
+                        match = _libraryManager.GetItemsResult(query).Items.FirstOrDefault();
+                        if (match != null) break;
+                    }
+
+                    if (match == null) continue;
+
+                    var oldEntries = _ratings
+                        .Where(kv => kv.Value.ItemId == group.Key)
+                        .ToList();
+
+                    foreach (var entry in oldEntries)
+                    {
+                        _ratings.Remove(entry.Key);
+                        entry.Value.ItemId = match.Id;
+                        _ratings[GetKey(match.Id, entry.Value.UserId)] = entry.Value;
+                    }
+
+                    needsSave = true;
+                }
+
+                if (needsSave) SaveRatings();
+
                 return _ratings.Values
                     .GroupBy(r => r.ItemId)
                     .Select(g => new RatedItemSummary
@@ -152,4 +229,3 @@ namespace Jellyfin.Plugin.UserRatings.Data
         }
     }
 }
-

@@ -1,9 +1,11 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Mime;
 using Jellyfin.Plugin.UserRatings.Data;
 using Jellyfin.Plugin.UserRatings.Models;
 using MediaBrowser.Common.Configuration;
+using MediaBrowser.Controller.Library;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Jellyfin.Plugin.UserRatings.Api
@@ -13,10 +15,12 @@ namespace Jellyfin.Plugin.UserRatings.Api
     public class RatingsController : ControllerBase
     {
         private readonly RatingRepository _repository;
-
-        public RatingsController(IApplicationPaths appPaths)
+        private readonly ILibraryManager _libraryManager;
+        
+        public RatingsController(IApplicationPaths appPaths, ILibraryManager libraryManager)
         {
-            _repository = new RatingRepository(appPaths);
+            _repository = new RatingRepository(appPaths, libraryManager);
+            _libraryManager = libraryManager;
         }
 
         [HttpPost("Rate")]
@@ -39,7 +43,10 @@ namespace Jellyfin.Plugin.UserRatings.Api
                     Timestamp = DateTime.UtcNow,
                     UserName = userName ?? "Unknown"
                 };
-
+                var item = _libraryManager.GetItemById(itemId);
+                if (item?.ProviderIds != null)
+                    userRating.ProviderIds = new Dictionary<string, string>(item.ProviderIds);
+                
                 _repository.SaveRating(userRating);
 
                 return Ok(new { success = true, message = "Rating saved successfully" });
@@ -187,7 +194,7 @@ namespace Jellyfin.Plugin.UserRatings.Api
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { success = false, message = ex.Message });
+                return StatusCode(500, new { success = false, message = ex.ToString() });
             }
         }
     }

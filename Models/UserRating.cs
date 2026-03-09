@@ -11,6 +11,7 @@ namespace Jellyfin.Plugin.UserRatings.Models
         public string? Note { get; set; }
         public DateTime Timestamp { get; set; }
         public string? UserName { get; set; } // Cached for display
+        public Dictionary<string, string>? ProviderIds { get; set; }
     }
 
     public class RatingStats
