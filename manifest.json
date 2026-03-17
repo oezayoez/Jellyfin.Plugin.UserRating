@@ -9,10 +9,10 @@
     "imageUrl": "https://raw.githubusercontent.com/oezayoez/Jellyfin.Plugin.UserRating/main/icon.png",
     "versions": [
       {
-        "version": "1.7.33.0",
+        "version": "1.7.34.0",
         "changelog": "Add ProviderIds storage and self-heal on rescan",
         "targetAbi": "10.11.0.0",
-        "sourceUrl": "https://github.com/oezayoez/Jellyfin.Plugin.UserRating/releases/download/v1.7.33/Jellyfin.Plugin.UserRatings.zip",
+        "sourceUrl": "https://github.com/oezayoez/Jellyfin.Plugin.UserRating/releases/download/v1.7.34/Jellyfin.Plugin.UserRatings.zip",
         "checksum": "38598908649f5cae286b805f05dd725b",
         "timestamp": "2026-03-09T04:00:00Z"
       }
