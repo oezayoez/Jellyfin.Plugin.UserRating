@@ -84,6 +84,47 @@ namespace Jellyfin.Plugin.UserRatings.Data
 
         private static string GetKey(Guid itemId, Guid userId) => $"{itemId}_{userId}";
 
+        private Guid ResolveItemId(Guid itemId)
+        {
+            bool hasRatings;
+            lock (_lock)
+            {
+                hasRatings = _ratings.Values.Any(r => r.ItemId == itemId);
+            }
+
+            if (hasRatings) return itemId;
+
+            var newItem = _libraryManager.GetItemById(itemId);
+            if (newItem?.ProviderIds == null || newItem.ProviderIds.Count == 0)
+                return itemId;
+
+            lock (_lock)
+            {
+                foreach (var kv in newItem.ProviderIds)
+                {
+                    var match = _ratings.Values.FirstOrDefault(r =>
+                        r.ProviderIds != null &&
+                        r.ProviderIds.TryGetValue(kv.Key, out var val) &&
+                        val == kv.Value);
+
+                    if (match == null) continue;
+
+                    var oldId = match.ItemId;
+                    var staleEntries = _ratings.Where(e => e.Value.ItemId == oldId).ToList();
+                    foreach (var entry in staleEntries)
+                    {
+                        _ratings.Remove(entry.Key);
+                        entry.Value.ItemId = itemId;
+                        _ratings[GetKey(itemId, entry.Value.UserId)] = entry.Value;
+                    }
+                    SaveRatings();
+                    return itemId;
+                }
+            }
+
+            return itemId;
+        }
+
         public void SaveRating(UserRating rating)
         {
             lock (_lock)
@@ -96,6 +137,7 @@ namespace Jellyfin.Plugin.UserRatings.Data
 
         public UserRating? GetRating(Guid itemId, Guid userId)
         {
+            itemId = ResolveItemId(itemId);
             lock (_lock)
             {
                 var key = GetKey(itemId, userId);
@@ -105,6 +147,7 @@ namespace Jellyfin.Plugin.UserRatings.Data
 
         public List<UserRating> GetRatingsForItem(Guid itemId)
         {
+            itemId = ResolveItemId(itemId);
             lock (_lock)
             {
                 return _ratings.Values
@@ -127,6 +170,7 @@ namespace Jellyfin.Plugin.UserRatings.Data
 
         public void DeleteRating(Guid itemId, Guid userId)
         {
+            itemId = ResolveItemId(itemId);
             lock (_lock)
             {
                 var key = GetKey(itemId, userId);
@@ -137,6 +181,7 @@ namespace Jellyfin.Plugin.UserRatings.Data
 
         public RatingStats GetStatsForItem(Guid itemId)
         {
+            itemId = ResolveItemId(itemId);
             lock (_lock)
             {
                 var ratings = _ratings.Values.Where(r => r.ItemId == itemId).ToList();
@@ -166,7 +211,7 @@ namespace Jellyfin.Plugin.UserRatings.Data
                 if (!_backfillDone)
                 {
                     _backfillDone = true;
-                    BackfillProviderIds(); // lock inside is fine, same thread
+                    BackfillProviderIds();
                 }
 
                 bool needsSave = false;
