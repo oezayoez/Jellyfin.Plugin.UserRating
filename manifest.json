@@ -10,11 +10,11 @@
     "versions": [
       {
         "version": "1.7.34.0",
-        "changelog": "Add ProviderIds storage and self-heal on rescan",
+        "changelog": "Fix stale item ID resolution via provider ID fallback after library rescan",
         "targetAbi": "10.11.0.0",
         "sourceUrl": "https://github.com/oezayoez/Jellyfin.Plugin.UserRating/releases/download/v1.7.34/Jellyfin.Plugin.UserRatings.zip",
-        "checksum": "38598908649f5cae286b805f05dd725b",
-        "timestamp": "2026-03-09T04:00:00Z"
+        "checksum": "d8c26cb425c07fd45a4401127d4225c7",
+        "timestamp": "2026-03-17T00:00:00Z"
       }
     ]
   }
