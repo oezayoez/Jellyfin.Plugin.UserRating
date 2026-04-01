@@ -17,7 +17,7 @@ namespace Jellyfin.Plugin.UserRatings
 
         public override string Name => "User Ratings";
 
-        public override Guid Id => Guid.Parse("b8c5d3e7-4f6a-8b9c-1d2e-3f4a5b6c7d8e");
+        public override Guid Id => Guid.Parse("6721e59a-5aa8-4952-8b40-400a645ea79a");
 
         public Plugin(IApplicationPaths applicationPaths, IXmlSerializer xmlSerializer, ILogger<Plugin> logger)
             : base(applicationPaths, xmlSerializer)

@@ -63,11 +63,11 @@ jobs:
         cat > manifest.json << EOF
         [
           {
-            "guid": "b8c5d3e7-4f6a-8b9c-1d2e-3f4a5b6c7d8e",
+            "guid": "6721e59a-5aa8-4952-8b40-400a645ea79a",
             "name": "User Ratings",
             "description": "Allow users to rate and review movies, TV shows, and music. See what other users on your server think!",
             "overview": "Social rating system for Jellyfin - rate content and see ratings from other users on your server",
-            "owner": "davidhenry",
+            "owner": "oezayoez",
             "category": "General",
             "imageUrl": "https://raw.githubusercontent.com/${{ github.repository }}/main/icon.png",
             "versions": [

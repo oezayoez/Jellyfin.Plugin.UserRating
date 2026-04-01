@@ -1,6 +1,6 @@
 [
   {
-    "guid": "f6d662fc-4a62-410f-9260-bac3cf2b5c37",
+    "guid": "6721e59a-5aa8-4952-8b40-400a645ea79a",
     "name": "User Ratings",
     "description": "Allow users to rate and review movies, TV shows, and music. See what other users on your server think!",
     "overview": "Social rating system for Jellyfin - rate content and see ratings from other users on your server",
