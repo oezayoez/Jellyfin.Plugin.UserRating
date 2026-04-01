@@ -9,12 +9,12 @@
     "imageUrl": "https://raw.githubusercontent.com/oezayoez/Jellyfin.Plugin.UserRating/main/icon.png",
     "versions": [
       {
-        "version": "1.7.35.0",
-        "changelog": "Fix stale item ID resolution via provider ID fallback after library rescan",
-        "targetAbi": "10.11.0.0",
-        "sourceUrl": "https://github.com/oezayoez/Jellyfin.Plugin.UserRating/releases/download/v1.7.35/Jellyfin.Plugin.UserRatings.zip",
-        "checksum": "36157b86f6c408bb18aa0c72da4f0df3",
-        "timestamp": "2026-03-17T00:00:00Z"
+        "version": "1.7.36.0",
+        "changelog": "Release 1.7.36",
+        "targetAbi": "10.9.0.0",
+        "sourceUrl": "https://github.com/oezayoez/Jellyfin.Plugin.UserRating/releases/download/v1.7.36/Jellyfin.Plugin.UserRatings.zip",
+        "checksum": "3f5f9fbfd135be55c17bc8941f8af94d",
+        "timestamp": "2026-04-01T14:11:45Z"
       }
     ]
   }
